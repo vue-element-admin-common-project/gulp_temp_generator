@@ -73,9 +73,25 @@ const tableConfig = {
   }
 }
 
+const formConfig = {
+  attach: 'dialog', mode: 'add', editReqParam: {},
+  async getEditData(editParam) { // 编辑时, 初始化数据
+    return {
+      id: editParam.id,
+    }
+  },
+  items: [
+    { // 公告标题
+      type: 'input', initVal: '', valueKey: 'title',
+      opt: { width: '120', placeholder: '公告标题' }
+    }
+  ]
+}
+
 module.exports = {
   __genTemp,
   filterBarConfig: filterBarConfig || null,
-  tableConfig
+  tableConfig,
+  formConfig
 }
 
