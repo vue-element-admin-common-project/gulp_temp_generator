@@ -16,6 +16,14 @@ const __genTemp = {
    * */
   // DateDurationPicker: null,
   DateDurationPicker: ['timeStar', 'timeEnd'],
+  /**
+   * 右侧功能按钮条
+   * */
+  RightBtnsBar: [{ type: 'primary', clickName: "add", word: "新增" }],
+  /**
+   * 新增/编辑弹窗
+   * */
+  // ComfirmDialog:
 }
 
 /**

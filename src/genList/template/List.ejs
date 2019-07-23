@@ -1,7 +1,9 @@
-<% // 搜索 FIXME 进行 修改 %>
+<!-- 搜索 FIXME 进行 修改 -->
 <% var datepicker = __genTemp.DateDurationPicker %>
+<% var rightBtnsBar = __genTemp.RightBtnsBar %>
 <% var filBarCon = filterBarConfig %>
 <% var tableCon = tableConfig %>
+<% var hasRightBtnsBar = rightBtnsBar && rightBtnsBar.length %>
 <% var hasOperationBtns = tableCon.operationBtns && tableCon.operationBtns.items %>
 <% var hasSwitchToggle = tableCon.columns.some(i => i.type == 'switchBtn') %>
 <template>
@@ -12,6 +14,18 @@
 <% if (filBarCon.length) { %>
     <!-- 搜索栏 -->
     <FilterBar :config="filterBarConfig" @clickSearch="clickSearch" />
+<% } %>
+<% if (hasRightBtnsBar) { %>
+    <!-- 偏右 功能按钮条 -->
+  <%
+  var string = ''
+  for (let i = 0, l = rightBtnsBar.length; i < l; i++) {
+    var item = rightBtnsBar[i]
+    string += `{ type: ${item.type || ''}, clickName: ${item.clickName || ''}, word: ${item.word || ''} }`
+  }
+  string = "[" + string + "]"
+  %>
+    <RightBtnsBar :config="<%= string %>" @clickBtn="clickRightBtn" />
 <% } %>
     <!-- 表格 -->
     <NormalTable :list="list" :config="tableConfig" :pending="listPending"
@@ -30,6 +44,7 @@
 <script>
 <% if (datepicker) { %>import DateDurationPicker from '@pro_common/components/DateDurationPicker/DateDurationPicker.vue'<% } %>
 <% if (filBarCon.length) { %>import FilterBar from '@pro_common/components/FilterBar/FilterBar.vue'<% } %>
+<% if (hasRightBtnsBar) { %>import RightBtnsBar from "@pro_common/components/RightBtnsBar/RightBtnsBar.vue"<% } %>
 import NormalTable from '@pro_common/components/Tables/NormalTable.vue'
 import Pagination from '@pro_common/components/Pagination/Pagination.vue'
 import {<%if(filterBarConfig.length) { %> filterBarConfig,  <% } %>tableConfig} from './configs'
@@ -126,6 +141,10 @@ export default {
     async switchToggle(key, row) {
     },
 <% } %>
+<% if (rightBtnsBar && rightBtnsBar.length) { %>
+    clickRightBtn(clickName) {
+    },
+<% } %>
   },
   async mounted() {
     this.getList()
@@ -133,6 +152,7 @@ export default {
   components: {
     <% if (datepicker) { %>DateDurationPicker,<% } %>
     <% if (filBarCon) { %>FilterBar,<% } %>
+    <% if (hasRightBtnsBar) { %>RightBtnsBar,<% } %>
     NormalTable,
     Pagination
   }
