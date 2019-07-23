@@ -23,7 +23,10 @@ const __genTemp = {
   /**
    * 新增/编辑弹窗
    * */
-  // ComfirmDialog:
+  ConfirmDialog: {
+    // 是否有 表单内嵌
+    hasForm: true
+  }
 }
 
 /**
@@ -72,7 +75,7 @@ const tableConfig = {
 
 module.exports = {
   __genTemp,
-  filterBarConfig,
+  filterBarConfig: filterBarConfig || null,
   tableConfig
 }
 

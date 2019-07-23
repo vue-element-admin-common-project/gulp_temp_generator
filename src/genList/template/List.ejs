@@ -3,20 +3,21 @@
 <% var rightBtnsBar = __genTemp.RightBtnsBar %>
 <% var filBarCon = filterBarConfig %>
 <% var tableCon = tableConfig %>
+<% var confirmDialog = __genTemp.ConfirmDialog %>
 <% var hasRightBtnsBar = rightBtnsBar && rightBtnsBar.length %>
 <% var hasOperationBtns = tableCon.operationBtns && tableCon.operationBtns.items %>
 <% var hasSwitchToggle = tableCon.columns.some(i => i.type == 'switchBtn') %>
 <template>
-  <div class="<%=__genTemp.wrapClass%>">
+<div class="<%=__genTemp.wrapClass%>">
 <% if (datepicker) { %>
-    <DateDurationPicker @dateChange="dateChange" />
+  <DateDurationPicker @dateChange="dateChange" />
 <% } %>
 <% if (filBarCon.length) { %>
-    <!-- 搜索栏 -->
-    <FilterBar :config="filterBarConfig" @clickSearch="clickSearch" />
+  <!-- 搜索栏 -->
+  <FilterBar ref="filterBar" :config="filterBarConfig" @clickSearch="clickSearch" @reset="filterReset" />
 <% } %>
 <% if (hasRightBtnsBar) { %>
-    <!-- 偏右 功能按钮条 -->
+  <!-- 偏右 功能按钮条 -->
   <%
   var string = ''
   for (let i = 0, l = rightBtnsBar.length; i < l; i++) {
@@ -25,20 +26,31 @@
   }
   string = "[" + string + "]"
   %>
-    <RightBtnsBar :config="<%= string %>" @clickBtn="clickRightBtn" />
+  <RightBtnsBar :config="<%= string %>" @clickBtn="clickRightBtn" />
 <% } %>
-    <!-- 表格 -->
-    <NormalTable :list="list" :config="tableConfig" :pending="listPending"
-                 <%if (tableCon.selection) {%>:selection.sync="listSelection"<% } %>
-                 <%if (hasSwitchToggle) { %>@switchToggle="switchToggle"<% } %>
-                 <%if (hasOperationBtns) { %>@operationBtnsClick="operationBtnsClick"<% } %>
-                 />
-    <!-- 分页 -->
-    <div style="display: flex;justify-content: flex-end;">
-      <Pagination :total="reqParam.total" :page.sync="reqParam.page"
-                  :limit.sync="reqParam.limit" @pagination="getList" />
-    </div>
+  <!-- 表格 -->
+  <NormalTable :list="list" :config="tableConfig" :pending="listPending"
+               <%if (tableCon.selection) {%>:selection.sync="listSelection"<% } %>
+               <%if (hasSwitchToggle) { %>@switchToggle="switchToggle"<% } %>
+               <%if (hasOperationBtns) { %>@operationBtnsClick="operationBtnsClick"<% } %>
+               />
+  <!-- 分页 -->
+  <div style="display: flex;justify-content: flex-end;">
+    <Pagination :total="reqParam.total" :page.sync="reqParam.page"
+                :limit.sync="reqParam.limit" @pagination="getList" />
   </div>
+<% if (confirmDialog) { %>
+    <ConfirmDialog :title="dialogConfig.title" width="700px"
+                   :visible.sync="dialogConfig.visible"
+                   @cancelHandler="cancelHandler" @submitHandler="submitHandler">
+      <div style="padding: 0 30px;">
+<% if (confirmDialog && confirmDialog.hasForm) { %>
+        <NormalForm ref="normalForm" :active="dialogConfig.visible" :config="formConfig" />
+<% } %>
+      </div>
+    </ConfirmDialog>
+<% } %>
+</div>
 </template>
 
 <script>
@@ -47,7 +59,9 @@
 <% if (hasRightBtnsBar) { %>import RightBtnsBar from "@pro_common/components/RightBtnsBar/RightBtnsBar.vue"<% } %>
 import NormalTable from '@pro_common/components/Tables/NormalTable.vue'
 import Pagination from '@pro_common/components/Pagination/Pagination.vue'
-import {<%if(filterBarConfig.length) { %> filterBarConfig,  <% } %>tableConfig} from './configs'
+<% if (confirmDialog) { %>import ConfirmDialog from '@pro_common/components/ConfirmDialog/ConfirmDialog.vue'<% } %>
+<% if (confirmDialog.hasForm) { %>import NormalForm from "@pro_common/components/NormalForm/NormalForm.vue"<% } %>
+import {<%if(filterBarConfig.length) { %>filterBarConfig, <% } %>tableConfig} from './configs'
 import deepClone from "@pro_common/utils/deepClone";
 import filterReqCreator from "@pro_common/utils/filterReqCreator";
 // import format10Ts2Txt from "@pro_common/utils/format10Ts2Txt";
@@ -78,10 +92,16 @@ export default {
         total: 0, // 总条数
         ...EMPTY_REQ_PARAM
       },
-  <%  if (filBarCon.length) { %>
+<% if (filBarCon.length) { %>
       // 搜索栏配置
       filterBarConfig: deepClone(filterBarConfig),
-  <% } %>
+<% } %>
+<% if (confirmDialog) { %>
+      dialogConfig: { // 弹窗配置
+        title: '新增公告',
+        visible: false
+      },
+<% } %>
     }
   },
   methods: {
@@ -118,6 +138,13 @@ export default {
       this.reqParam.total = 0
       this.getList()
     },
+    filterReset() { // 重置搜索
+      const FilterBar = this.$refs.filterBar
+      Object.keys(EMPTY_REQ_PARAM).forEach(key => {
+        FilterBar.$_setObj(key, EMPTY_REQ_PARAM[key])
+      })
+      FilterBar.$_clickSearch()
+    },
 <% } %>
 <% if (datepicker) { %>
     dateChange(date) {
@@ -145,6 +172,14 @@ export default {
     clickRightBtn(clickName) {
     },
 <% } %>
+<% if (confirmDialog) { %>
+    cancelHandler(closeCb) {
+      closeCb()
+    },
+    async submitHandler(closeCb) {
+      closeCb()
+    }
+<% } %>
   },
   async mounted() {
     this.getList()
@@ -154,7 +189,9 @@ export default {
     <% if (filBarCon) { %>FilterBar,<% } %>
     <% if (hasRightBtnsBar) { %>RightBtnsBar,<% } %>
     NormalTable,
-    Pagination
+    Pagination,
+    <% if (confirmDialog) { %>ConfirmDialog,<% } %>
+    <% if (confirmDialog && confirmDialog.hasForm) { %>NormalForm,<% } %>
   }
 }
 </script>
