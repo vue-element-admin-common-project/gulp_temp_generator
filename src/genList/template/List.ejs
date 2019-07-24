@@ -167,14 +167,36 @@ export default {
 <% } %>
 <% if (hasOperationBtns) { %>
     async operationBtnsClick(clickName, row) {
+<% var oprBtns = tableCon.operationBtns.items %>
+<% for (var i = 0, l = oprBtns.length; i < l; i++) { %>
+      if (clickName == "<%= oprBtns[i].clickName %>") {
+        // TODO 待填充
+        console.log(row)
+        return
+      }
+<% } %>
     },
 <% } %>
 <% if (hasSwitchToggle) { %>
     async switchToggle(key, row) {
+<% var switchList = tableCon.columns.filter(i => i.type == 'switchBtn') %>
+<% for (var i = 0, l = switchList.length; i < l; i++) { %>
+      if (key == "<%= switchList[i].key %>") {
+        // TODO 待填充
+        console.log(row)
+        return
+      }
+<% } %>
     },
 <% } %>
 <% if (rightBtnsBar && rightBtnsBar.length) { %>
     clickRightBtn(clickName) {
+<% for (var i = 0, l = rightBtnsBar.length; i < l; i++) { %>
+      if (clickName == "<%= rightBtnsBar[i].clickName %>") {
+        // TODO 待填充
+        return
+      }
+<% } %>
     },
 <% } %>
 <% if (confirmDialog) { %>
